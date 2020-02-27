@@ -71,7 +71,19 @@ let utils = {
             value: 'Female',
             displaylbl: 'Female'
         }
-    ]
+    ],
+    deletePopupConfig: {
+        title: 'Delete Record',
+        body: 'Do you want to delete this record ? This action cannot be undone',
+        btntext: 'Delete',
+        pbtnAction: () => 0,
+    },
+    updatePopupConfig: {
+        title: 'Update Record',
+        body: 'Do you want to update this record ?',
+        btntext: 'Update',
+        pbtnAction: () => 0,
+    },
 }
 
 export default utils

@@ -12,15 +12,29 @@ export default class Register extends Component {
 
     this.state = {
       modal: false,
-      userData: []
+      userData: [],
+      modalConfig: {
+        title: '',
+        body: '',
+        btntext: '',
+        pbtnAction: () => 0,
+      }
     }
   }
-  modalconfig = {
-    title: '',
-    body: '',
-    btntext: '',
-    pbtnAction: () => 0,
-  };
+  toggle = () => {
+    this.setState({ modal: !this.state.modal });
+  }
+  deleteHandler = (id) => {
+    let { userData } = this.state;
+    userData.splice(id, 1);
+    this.setState({ userData });
+    this.toggle();
+  }
+  showDeletePopup = (id) => {
+    utils.deletePopupConfig.pbtnAction = () => this.deleteHandler(id);
+    this.setState({ modalConfig: utils.deletePopupConfig }, console.log(this.state))
+    this.toggle();
+  }
 
   render() {
     return (
@@ -49,14 +63,17 @@ export default class Register extends Component {
             let { userData } = this.state;
             userData.push(values);
             this.setState({ userData });
+            // resetForm({});
+            //values.fname = values.lname = values.email = values.mobileno = values.password = values.gender = values.city = '';
+            //values.language = [];
             setTimeout(() => {
-              alert(JSON.stringify(values, null, 2));
               setSubmitting(false);
             }, 400);
           }}
         >
           {({ isSubmitting }) => (
             <Form>
+              <h1>Register</h1>
               <FormFields type="text" name="fname" lbl="First Name" id="fname" />
               <FormFields type="text" name="lname" lbl="Last Name" id="lname" />
               <FormFields type="email" name="email" lbl="Email Id" id="emailId" />
@@ -65,20 +82,18 @@ export default class Register extends Component {
               <FormFields type="password" name="password" id="password" lbl="Password" />
               <FormFields type="select" name="city" id="city" lbl="City" ddoptions={utils.cityDD} />
               <FormFields type="checkbox" name="language" id="language" lbl="Language" checkboxes={utils.checkboxGroup} />
-              <button type="submit" disabled={isSubmitting}>
-                Submit
-          </button>
+              <button type="submit" disabled={isSubmitting}>Submit</button>
             </Form>
           )}
         </Formik>
         <ModalPopup isOpen={this.state.modal}
           toggle={this.toggle}
-          modaltitle={this.modalconfig.title}
-          modalbody={this.modalconfig.body}
-          btntext={this.modalconfig.btntext}
-          pbtnaction={this.modalconfig.pbtnAction}></ModalPopup>
-
-        <UserTable deleteclicked={this.showDeletePopup} editclicked={this.onEditClick} data={this.state.userData} />
+          modaltitle={this.state.modalConfig.title}
+          modalbody={this.state.modalConfig.body}
+          btntext={this.state.modalConfig.btntext}
+          pbtnaction={this.state.modalConfig.pbtnAction}></ModalPopup>
+        <br /><br />
+        {this.state.userData.length > 0 && <UserTable deleteclicked={this.showDeletePopup} data={this.state.userData} />}
       </div>
 
     )
