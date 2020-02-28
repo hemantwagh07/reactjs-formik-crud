@@ -1,6 +1,15 @@
 .App {
   text-align: center;
 }
+i{
+  color: red;
+  float: left;
+}
+table .actiontd:hover{
+  background-color: grey;
+  color: white;
+  cursor: pointer;
+}
 
 .App-logo {
   height: 40vmin;

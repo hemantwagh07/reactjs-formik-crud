@@ -4,6 +4,7 @@ import FormFields from '../FormFields';
 import utils from './Utils';
 import UserTable from '../Table/UserTable';
 import ModalPopup from '../Table/ModalPopup';
+import { Col, FormGroup } from 'reactstrap';
 
 
 export default class Register extends Component {
@@ -12,6 +13,7 @@ export default class Register extends Component {
 
     this.state = {
       modal: false,
+      fname: '', lname: '', mobileno: '', email: '', password: '', gender: '', city: '', language: '',
       userData: [],
       modalConfig: {
         title: '',
@@ -21,8 +23,16 @@ export default class Register extends Component {
       }
     }
   }
+  currentEdit = null;
   toggle = () => {
     this.setState({ modal: !this.state.modal });
+  }
+  updateHandler = (id, vals) => {
+    let { userData } = this.state;
+    Object.assign(userData[id], vals);
+    this.currentEdit = null;
+    this.setState({ fname: '', lname: '', mobileno: '', email: '', password: '', gender: '', city: '', language: '' })
+    this.toggle();
   }
   deleteHandler = (id) => {
     let { userData } = this.state;
@@ -32,15 +42,22 @@ export default class Register extends Component {
   }
   showDeletePopup = (id) => {
     utils.deletePopupConfig.pbtnAction = () => this.deleteHandler(id);
-    this.setState({ modalConfig: utils.deletePopupConfig }, console.log(this.state))
+    this.setState({ modalConfig: utils.deletePopupConfig })
     this.toggle();
+  }
+  onEditClick = (id) => {
+    let currentUserData = this.state.userData[id];
+    this.setState({ ...currentUserData }, console.log(this.state));
+    this.currentEdit = id;
   }
 
   render() {
+    let { fname, lname, mobileno, email, password, gender, city, language } = this.state;
     return (
       <div>
         <Formik
-          initialValues={{ fname: '', lname: '', mobileno: '', email: '', password: '', gender: '', city: '', language: '' }}
+          enableReinitialize={true}
+          initialValues={{ fname: fname, lname: lname, mobileno: mobileno, email: email, password: password, gender: gender, city: city, language: language }}
           validate={values => {
             const errors = {};
             let e = '';
@@ -58,14 +75,18 @@ export default class Register extends Component {
             e = (!values.city || values.city === '') ? errors.city = utils.errormessage.required.city : null;
             return errors;
           }}
-          onSubmit={(values, { setSubmitting }) => {
-            console.log(values);
+          onSubmit={(values, { setSubmitting, resetForm }) => {
             let { userData } = this.state;
-            userData.push(values);
+            if (this.currentEdit !== null) { //Update case
+              let { fname, lname, mobileno, email, password, gender, city, language } = values;
+              utils.updatePopupConfig.pbtnAction = () => this.updateHandler(this.currentEdit, values);
+              this.setState({ fname, lname, mobileno, email, password, gender, city, language, modalConfig: utils.updatePopupConfig });
+              this.toggle();
+            } else {
+              userData.push(values);
+            }
             this.setState({ userData });
-            // resetForm({});
-            //values.fname = values.lname = values.email = values.mobileno = values.password = values.gender = values.city = '';
-            //values.language = [];
+            resetForm();
             setTimeout(() => {
               setSubmitting(false);
             }, 400);
@@ -93,7 +114,13 @@ export default class Register extends Component {
           btntext={this.state.modalConfig.btntext}
           pbtnaction={this.state.modalConfig.pbtnAction}></ModalPopup>
         <br /><br />
-        {this.state.userData.length > 0 && <UserTable deleteclicked={this.showDeletePopup} data={this.state.userData} />}
+        <FormGroup row>
+        <Col sm={1}></Col>
+          <Col sm={10}>
+            {this.state.userData.length > 0 && <UserTable editclicked={this.onEditClick} deleteclicked={this.showDeletePopup} data={this.state.userData} />}
+          </Col>
+        </FormGroup>
+
       </div>
 
     )
