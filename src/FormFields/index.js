@@ -18,7 +18,7 @@ export default function FormFields(props) {
                         : (type === "checkbox") ?
                             <>
                                 {checkboxes.map((item, index) => (
-                                    <Col sm={2} className="float-left">
+                                    <Col sm={2} key={index} className="float-left">
                                         <label>
                                             <Field type="checkbox" name={item.name} value={item.value} />
                                             {item.displaylbl}
@@ -29,7 +29,7 @@ export default function FormFields(props) {
                             : (type === "radio") ?
                                 <>
                                     {radiobtns.map((item, index) => (
-                                        <Col sm={2} className="float-left">
+                                        <Col sm={2} key={index} className="float-left">
                                             <label>
                                                 <Field type="radio" id={item.id} name={item.name} value={item.value} />
                                                 {item.displaylbl}
